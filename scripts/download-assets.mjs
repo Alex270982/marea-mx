@@ -83,6 +83,30 @@ if (videoMatch) {
   }
 }
 
+/* Per-property scroll-scrub films: mirror FILM_SOURCES entries whose value is
+   already a real URL into public/assets/films/<slug>.mp4. Placeholder values
+   (FILM_URL_*) are skipped without failing the run. */
+const filmsMatch = source.match(/const FILM_SOURCES[^=]*=\s*\{([\s\S]*?)\};/);
+if (filmsMatch) {
+  const filmsDir = join(outDir, "films");
+  await mkdir(filmsDir, { recursive: true });
+  for (const m of filmsMatch[1].matchAll(/"([\w-]+)"\s*:\s*"([^"]+)"/g)) {
+    const [, slug, url] = m;
+    if (!url.startsWith("http")) {
+      console.log(`  skip films/${slug}.mp4 (source not published yet)`);
+      continue;
+    }
+    try {
+      const bytes = await download(url, join(filmsDir, `${slug}.mp4`));
+      ok += 1;
+      console.log(`  ok  public/assets/films/${slug}.mp4 (${(bytes / 1048576).toFixed(1)} MB)`);
+    } catch (e) {
+      failed += 1;
+      console.warn(`  FAIL film ${slug}: ${e.message}`);
+    }
+  }
+}
+
 console.log(`\n[download-assets] done: ${ok} downloaded, ${failed} failed.`);
 if (failed) {
   console.log(

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { asset, OPENER_VIDEO, OPENER_VIDEO_MOBILE } from "@/lib/assets";
 import type { Dict, Locale } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/motion";
+import { startFilmScrub, type FilmScrub } from "@/lib/useFilmScrub";
 
 const INTRO_KEY = "marea-intro-seen";
 const CHAPTER_LABELS = ["01", "02", "03", "04"];
@@ -87,28 +88,10 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
       return;
     }
 
-    let video: HTMLVideoElement | null = null;
-    let videoDuration = 0;
-    let targetTime = 0;
-    let raf: number | null = null;
-    let blobUrl: string | null = null;
-    let aborted = false;
-    let xhr: XMLHttpRequest | null = null;
-    let safetyTimer: ReturnType<typeof setTimeout> | null = null;
+    let scrub: FilmScrub | null = null;
     let statementShown = false;
-    let filmReady = false;
 
     const dismissLoader = () => setLoaderDone(true);
-
-    /* mobile-only graceful degradation: if the film can't arrive (missing
-       encode, fetch failure, timeout), settle into the static 100dvh hero
-       instead of leaving a broken tall scroll. Desktop keeps the tall
-       poster-backed scroll exactly as before. */
-    const failToStatic = () => {
-      if (aborted || filmReady) return;
-      dismissLoader();
-      if (mode.mobile) setMode({ short: true, video: false, mobile: true });
-    };
 
     const showStatement = (show: boolean) => {
       if (show === statementShown) return;
@@ -120,67 +103,27 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
       });
     };
 
-    const startScrubLoop = () => {
-      const step = () => {
-        if (!video) return;
-        const delta = targetTime - video.currentTime;
-        if (Math.abs(delta) > 0.02 && !video.seeking) {
-          try {
-            video.currentTime = video.currentTime + delta * 0.22;
-          } catch {
-            /* scrub can race a seek; skip this frame */
-          }
-        }
-        raf = requestAnimationFrame(step);
-      };
-      raf = requestAnimationFrame(step);
-    };
-
-    /* video loading with real progress */
+    /* video loading with real progress (shared film-scrub mechanics) */
     if (mode.video) {
       const src = mode.mobile && OPENER_VIDEO_MOBILE ? OPENER_VIDEO_MOBILE : OPENER_VIDEO;
-      xhr = new XMLHttpRequest();
-      xhr.open("GET", src, true);
-      xhr.responseType = "blob";
-      xhr.onprogress = (e) => {
-        if (!e.lengthComputable) return;
-        const p = e.loaded / e.total;
-        if (loaderBarRef.current) loaderBarRef.current.style.transform = "scaleX(" + p + ")";
-        if (loaderPctRef.current)
-          loaderPctRef.current.textContent = h.loading + " · " + Math.round(p * 100) + "%";
-      };
-      xhr.onload = () => {
-        if (aborted || !xhr || xhr.status !== 200) {
-          failToStatic();
-          return;
+      scrub = startFilmScrub({
+        src,
+        container: () => mediaRef.current,
+        onProgress: (p) => {
+          if (loaderBarRef.current) loaderBarRef.current.style.transform = "scaleX(" + p + ")";
+          if (loaderPctRef.current)
+            loaderPctRef.current.textContent = h.loading + " · " + Math.round(p * 100) + "%";
+        },
+        onReady: dismissLoader,
+        /* mobile-only graceful degradation: if the film can't arrive (missing
+           encode, fetch failure, timeout), settle into the static 100dvh hero
+           instead of leaving a broken tall scroll. Desktop keeps the tall
+           poster-backed scroll exactly as before. */
+        onFail: () => {
+          dismissLoader();
+          if (mode.mobile) setMode({ short: true, video: false, mobile: true });
         }
-        blobUrl = URL.createObjectURL(xhr.response as Blob);
-        video = document.createElement("video");
-        video.muted = true;
-        video.playsInline = true;
-        video.setAttribute("playsinline", "");
-        video.preload = "auto";
-        video.src = blobUrl;
-        video.addEventListener(
-          "loadeddata",
-          () => {
-            if (aborted || !video) return;
-            filmReady = true;
-            videoDuration = video.duration || 12;
-            mediaRef.current?.appendChild(video);
-            video.currentTime = 0.001;
-            dismissLoader();
-            startScrubLoop();
-          },
-          { once: true }
-        );
-        video.addEventListener("error", failToStatic, { once: true });
-        video.load();
-      };
-      xhr.onerror = failToStatic;
-      xhr.send();
-      /* safety: never hold the page hostage */
-      safetyTimer = setTimeout(failToStatic, 9000);
+      });
     } else {
       dismissLoader();
     }
@@ -190,11 +133,12 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
       const total = opener.offsetHeight - window.innerHeight;
       const y = Math.min(Math.max(window.scrollY, 0), total);
       const p = total > 0 ? y / total : 1;
-      if (video && videoDuration) {
+      if (scrub && scrub.ready()) {
         const journey = Math.min(p / 0.84, 1);
-        targetTime = journey * Math.max(videoDuration - 0.05, 0);
+        scrub.setTargetTime(journey * Math.max(scrub.duration() - 0.05, 0));
         const poster = posterRef.current;
-        if (poster && poster.style.opacity !== "0" && video.readyState >= 2)
+        const video = scrub.video();
+        if (poster && poster.style.opacity !== "0" && video && video.readyState >= 2)
           poster.style.opacity = "0";
       }
       if (p < 0.03) setChapter(-1);
@@ -220,29 +164,9 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
     onScroll();
 
     return () => {
-      aborted = true;
       window.removeEventListener("scroll", onScroll);
-      if (safetyTimer) clearTimeout(safetyTimer);
-      if (xhr) {
-        try {
-          xhr.abort();
-        } catch {
-          /* already settled */
-        }
-      }
-      if (raf) cancelAnimationFrame(raf);
-      if (video) {
-        try {
-          video.pause();
-          video.removeAttribute("src");
-          video.load();
-          video.remove();
-        } catch {
-          /* detached */
-        }
-        video = null;
-      }
-      if (blobUrl) URL.revokeObjectURL(blobUrl);
+      scrub?.destroy();
+      scrub = null;
     };
   }, [mode, h.loading]);
 

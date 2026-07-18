@@ -66,6 +66,38 @@ export const OPENER_VIDEO_MOBILE: string | null = ASSETS_BASE.startsWith("/")
   ? `${ASSETS_BASE}openerVideo-mobile.mp4`
   : null;
 
+/* ------------------------------------------------------------------ *
+ *  Per-property cinematic scroll-scrub films (detail pages).
+ *  Values are remote CDN URLs; the literal FILM_URL_* strings are
+ *  placeholders swapped for real https URLs once the encodes land.
+ *  CI mirrors each into public/assets/films/<slug>.mp4 (plus a
+ *  <slug>-mobile.mp4 encode) via scripts/download-assets.mjs.
+ * ------------------------------------------------------------------ */
+export const FILM_SOURCES: Record<string, string> = {
+  "casa-almar": "https://d8j0ntlcm91z4.cloudfront.net/user_3EVUjfFb2k95w4JeS0MbCVF86jY/hf_20260718_180846_9a580759-4d5a-444f-88a9-9a0ce80555d2.mp4",
+  "casa-umbral": "https://d8j0ntlcm91z4.cloudfront.net/user_3EVUjfFb2k95w4JeS0MbCVF86jY/hf_20260718_180913_63999323-bcc9-4ef6-911e-94f38592994f.mp4",
+  "penthouse-horizonte": "https://d8j0ntlcm91z4.cloudfront.net/user_3EVUjfFb2k95w4JeS0MbCVF86jY/hf_20260718_180916_d5ab6d33-a214-422b-b248-505dd466b51a.mp4"
+};
+
+/** Film sources for a property detail page, or null when the slug has no
+    film (or only an unpublished placeholder while on the remote CDN base). */
+export function propertyFilm(
+  slug: string
+): { desktop: string; mobile: string | null } | null {
+  const src = FILM_SOURCES[slug];
+  if (!src) return null;
+  if (ASSETS_BASE.startsWith("/")) {
+    /* mirrored build: CI places the encodes next to the other assets,
+       regardless of the placeholder state of FILM_SOURCES */
+    return {
+      desktop: `${ASSETS_BASE}films/${slug}.mp4`,
+      mobile: `${ASSETS_BASE}films/${slug}-mobile.mp4`
+    };
+  }
+  /* CDN dev fallback: only a real https URL counts; no mobile encode */
+  return src.startsWith("http") ? { desktop: src, mobile: null } : null;
+}
+
 /** Remote source files, used by scripts/download-assets.mjs to mirror locally. */
 export const ASSET_SOURCE_FILES: Record<string, string> = FILES;
 export const OPENER_VIDEO_SOURCE =

@@ -468,6 +468,28 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .pd__heromain { position: absolute; left: var(--margin); right: var(--margin); bottom: clamp(28px, 5vh, 60px); z-index: 2; color: var(--ivory); display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
 .pd__heromain .label { display: block; margin-bottom: 10px; opacity: 0.8; }
 .pd__gallerybtns { display: flex; gap: 12px; }
+
+/* ---------- per-property cinematic scroll-scrub hero ---------- */
+.pdfilm { position: relative; height: 300vh; background: var(--charcoal); }
+.pdfilm--mobile { height: 260vh; }
+.pdfilm__stage { position: sticky; top: 0; height: 100dvh; overflow: hidden; }
+.pdfilm__media, .pdfilm__media video, .pdfilm__media img {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.pdfilm__media img { transition: opacity 0.7s var(--ease-out); }
+.pdfilm__veil { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(rgba(13,16,18,0.28), transparent 36%, transparent 62%, rgba(13,16,18,0.6)); }
+.pdfilm__stage .pd__heromain { z-index: 3; }
+.pdfilm__loader {
+  position: absolute; left: var(--margin); bottom: clamp(132px, 20vh, 210px); z-index: 4;
+  display: flex; flex-direction: column; gap: 10px; color: var(--ivory);
+  transition: opacity 0.9s var(--ease-out), visibility 0.9s;
+}
+.pdfilm__loader.is-done { opacity: 0; visibility: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .pdfilm { height: auto; }
+  .pdfilm--mobile { height: auto; }
+  .pdfilm__stage { position: relative; height: 100dvh; }
+}
 .btn-ghost { border: 1px solid var(--hairline-light); color: var(--ivory); padding: 12px 20px; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 560; transition: background 0.35s, color 0.35s, border-color 0.35s; backdrop-filter: blur(4px); }
 .btn-ghost:hover { background: var(--ivory); color: var(--charcoal); border-color: var(--ivory); }
 .pd__layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: clamp(28px, 4vw, 72px); padding: clamp(48px, 6vw, 90px) var(--margin); align-items: start; }

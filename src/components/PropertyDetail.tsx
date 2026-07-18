@@ -9,7 +9,7 @@ import {
   similarListings,
   type Listing
 } from "@/lib/data";
-import { asset } from "@/lib/assets";
+import { asset, propertyFilm } from "@/lib/assets";
 import { fmtUSDBare, pricePerM2, whatsappHref } from "@/lib/format";
 import {
   DESKTOP_MOTION_MEDIA,
@@ -23,6 +23,7 @@ import MapExplorer from "@/components/MapExplorer";
 import InquiryPanel from "@/components/InquiryPanel";
 import Lightbox from "@/components/Lightbox";
 import SimCard from "@/components/SimCard";
+import PropertyScrub from "@/components/PropertyScrub";
 
 export default function PropertyDetail({
   l,
@@ -44,6 +45,7 @@ export default function PropertyDetail({
   const [lbIndex, setLbIndex] = useState<number | null>(null);
   const mainRef = useRef<HTMLElement | null>(null);
   const heroImgRef = useRef<HTMLImageElement | null>(null);
+  const film = propertyFilm(l.slug);
 
   useEffect(() => {
     pushRecent(l.slug);
@@ -87,27 +89,39 @@ export default function PropertyDetail({
   return (
     <>
       <main className="page" style={{ paddingTop: 0 }} ref={mainRef}>
-        <section className="pd__hero">
-          <AssetImg k={l.image} kind="raw" alt={loc.name} ref={heroImgRef} />
-          <div className="pd__heromain">
-            <div>
-              <span className="label">
-                {l.neighborhood} · {destName(l.destination, locale)} · {d.types[l.type] || l.type}
-              </span>
-              <h1 className="d1" style={{ fontSize: "clamp(2.4rem,5.4vw,4.6rem)" }}>
-                {loc.name}
-              </h1>
+        {film ? (
+          <PropertyScrub
+            l={l}
+            locale={locale}
+            d={d}
+            film={film}
+            galleryCount={gallery.length}
+            onGallery={() => setLbIndex(0)}
+            onTour={tourToast}
+          />
+        ) : (
+          <section className="pd__hero">
+            <AssetImg k={l.image} kind="raw" alt={loc.name} ref={heroImgRef} />
+            <div className="pd__heromain">
+              <div>
+                <span className="label">
+                  {l.neighborhood} · {destName(l.destination, locale)} · {d.types[l.type] || l.type}
+                </span>
+                <h1 className="d1" style={{ fontSize: "clamp(2.4rem,5.4vw,4.6rem)" }}>
+                  {loc.name}
+                </h1>
+              </div>
+              <div className="pd__gallerybtns">
+                <button className="btn-ghost" onClick={() => setLbIndex(0)}>
+                  {li.gallery} · {gallery.length}
+                </button>
+                <button className="btn-ghost" onClick={tourToast}>
+                  {li.video} / {li.tour}
+                </button>
+              </div>
             </div>
-            <div className="pd__gallerybtns">
-              <button className="btn-ghost" onClick={() => setLbIndex(0)}>
-                {li.gallery} · {gallery.length}
-              </button>
-              <button className="btn-ghost" onClick={tourToast}>
-                {li.video} / {li.tour}
-              </button>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         <div className="pd__layout">
           <div className="pd__main">

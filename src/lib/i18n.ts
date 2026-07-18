@@ -132,6 +132,7 @@ export interface Dict {
     floorplan: string;
     video: string;
     tour: string;
+    skip_film: string;
     beds: string;
     baths: string;
     interior: string;
@@ -248,7 +249,7 @@ export const I18N: Record<Locale, Dict> = {
       location: "Location", nearby: "Nearby", development: "Development details", timeline: "Delivery timeline",
       pricing: "Pricing", costs: "Estimated costs", projection: "Investment projection", similar: "Similar residences",
       advisor: "Your advisor", inquire: "Inquire", viewing: "Schedule a private viewing", brochure: "Download brochure",
-      share: "Share", gallery: "Gallery", floorplan: "Floor plan", video: "Film", tour: "3D tour",
+      share: "Share", gallery: "Gallery", floorplan: "Floor plan", video: "Film", tour: "3D tour", skip_film: "Skip flight",
       beds: "Bedrooms", baths: "Bathrooms", interior: "Interior", terrace: "Terrace", fees: "Maintenance", delivery: "Delivery",
       price_usd: "Price (USD)", price_mxn: "approx. MXN", per_m2: "per m²",
       proj_note: "Projection uses current comparable nightly rates at 62% occupancy, net of operating costs. Illustrative only.",
@@ -330,7 +331,7 @@ export const I18N: Record<Locale, Dict> = {
       location: "Ubicación", nearby: "Cerca", development: "Detalles del desarrollo", timeline: "Calendario de entrega",
       pricing: "Precios", costs: "Costos estimados", projection: "Proyección de inversión", similar: "Residencias similares",
       advisor: "Tu asesor", inquire: "Contactar", viewing: "Agendar visita privada", brochure: "Descargar brochure",
-      share: "Compartir", gallery: "Galería", floorplan: "Planta", video: "Film", tour: "Recorrido 3D",
+      share: "Compartir", gallery: "Galería", floorplan: "Planta", video: "Film", tour: "Recorrido 3D", skip_film: "Saltar recorrido",
       beds: "Recámaras", baths: "Baños", interior: "Interior", terrace: "Terraza", fees: "Mantenimiento", delivery: "Entrega",
       price_usd: "Precio (USD)", price_mxn: "aprox. MXN", per_m2: "por m²",
       proj_note: "La proyección usa tarifas nocturnas comparables actuales al 62% de ocupación, neta de costos operativos. Solo ilustrativa.",
