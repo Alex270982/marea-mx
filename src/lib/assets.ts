@@ -55,7 +55,7 @@ function buildAssets(): Record<string, AssetEntry> {
 export const ASSETS: Record<string, AssetEntry> = buildAssets();
 
 export const OPENER_VIDEO = ASSETS_BASE.startsWith("/")
-  ? `${ASSETS_BASE}openerVideo.mp4`
+  ? `${ASSETS_BASE}openerVideo-scrub.mp4`
   : `${ASSETS_BASE}hf_20260718_054943_49351765-f1fa-48ad-b2da-c55cdba478c0.mp4`;
 
 /** Lightweight ~720p encode for the phone scroll-scrub opener. Produced by CI
@@ -63,7 +63,7 @@ export const OPENER_VIDEO = ASSETS_BASE.startsWith("/")
     are still pointing at the remote CDN (dev fallback) it is null and phones
     get the settled static hero instead. */
 export const OPENER_VIDEO_MOBILE: string | null = ASSETS_BASE.startsWith("/")
-  ? `${ASSETS_BASE}openerVideo-mobile.mp4`
+  ? `${ASSETS_BASE}openerVideo-scrub-mobile.mp4`
   : null;
 
 /* ------------------------------------------------------------------ *
@@ -90,8 +90,8 @@ export function propertyFilm(
     /* mirrored build: CI places the encodes next to the other assets,
        regardless of the placeholder state of FILM_SOURCES */
     return {
-      desktop: `${ASSETS_BASE}films/${slug}.mp4`,
-      mobile: `${ASSETS_BASE}films/${slug}-mobile.mp4`
+      desktop: `${ASSETS_BASE}films/${slug}-scrub.mp4`,
+      mobile: `${ASSETS_BASE}films/${slug}-scrub-mobile.mp4`
     };
   }
   /* CDN dev fallback: only a real https URL counts; no mobile encode */
