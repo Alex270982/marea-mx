@@ -54,7 +54,7 @@ export default function Nav({ locale, d }: { locale: Locale; d: Dict }) {
   const switchLang = (target: Locale) => {
     if (target === locale) return;
     const { pathname: p, search, hash } = window.location;
-    const next = p.replace(/^\/(en|es)(?=\/|$)/, `/${target}`);
+    const next = p.replace(/\/(en|es)(?=\/|$)/, `/${target}`);
     window.location.href = next + search + hash;
   };
 
@@ -122,7 +122,7 @@ export default function Nav({ locale, d }: { locale: Locale; d: Dict }) {
           setMenuOpen(false);
           if (target === locale) return;
           const { pathname: p, search, hash } = window.location;
-          window.location.href = p.replace(/^\/(en|es)(?=\/|$)/, `/${target}`) + search + hash;
+          window.location.href = p.replace(/\/(en|es)(?=\/|$)/, `/${target}`) + search + hash;
         }}
       />
     </>

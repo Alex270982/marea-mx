@@ -41,7 +41,10 @@ if (!Object.keys(files).length) fail("Asset map parsed empty.");
 
 await mkdir(outDir, { recursive: true });
 
+import { stat } from "node:fs/promises";
+
 async function download(url, dest) {
+  try { const st = await stat(dest); if (st.size > 0) return 0; } catch {}
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
   const buf = Buffer.from(await res.arrayBuffer());
