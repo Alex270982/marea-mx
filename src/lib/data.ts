@@ -89,6 +89,7 @@ export interface Listing {
 export interface Poi {
   id: string;
   mapXY: [number, number];
+  coords: Coords;
   type: "airport" | "marina" | "beach" | "wellness";
   en: string;
   es: string;
@@ -488,12 +489,12 @@ export const LISTINGS: Listing[] = [
 ];
 
 export const POIS: Poi[] = [
-  { id: "cun-airport", mapXY: [70, 16], type: "airport", en: "Cancún Intl. Airport", es: "Aeropuerto Intl. de Cancún" },
-  { id: "tul-airport", mapXY: [22, 94], type: "airport", en: "Tulum Intl. Airport", es: "Aeropuerto Intl. de Tulum" },
-  { id: "marina", mapXY: [75, 9], type: "marina", en: "Puerto Cancún Marina", es: "Marina Puerto Cancún" },
-  { id: "ferry", mapXY: [57, 49], type: "marina", en: "Cozumel Ferry", es: "Ferry a Cozumel" },
-  { id: "reef", mapXY: [40, 76], type: "beach", en: "Sian Ka'an Biosphere", es: "Biosfera de Sian Ka'an" },
-  { id: "cenotes", mapXY: [38, 70], type: "wellness", en: "Cenote corridor", es: "Corredor de cenotes" }
+  { id: "cun-airport", mapXY: [70, 16], coords: { lat: 21.0365, lng: -86.8771 }, type: "airport", en: "Cancún Intl. Airport", es: "Aeropuerto Intl. de Cancún" },
+  { id: "tul-airport", mapXY: [22, 94], coords: { lat: 20.15, lng: -87.53 }, type: "airport", en: "Tulum Intl. Airport", es: "Aeropuerto Intl. de Tulum" },
+  { id: "marina", mapXY: [75, 9], coords: { lat: 21.1568, lng: -86.8035 }, type: "marina", en: "Puerto Cancún Marina", es: "Marina Puerto Cancún" },
+  { id: "ferry", mapXY: [57, 49], coords: { lat: 20.627, lng: -87.0785 }, type: "marina", en: "Cozumel Ferry", es: "Ferry a Cozumel" },
+  { id: "reef", mapXY: [40, 76], coords: { lat: 20.12, lng: -87.47 }, type: "beach", en: "Sian Ka'an Biosphere", es: "Biosfera de Sian Ka'an" },
+  { id: "cenotes", mapXY: [38, 70], coords: { lat: 20.53, lng: -87.25 }, type: "wellness", en: "Cenote corridor", es: "Corredor de cenotes" }
 ];
 
 export const AMENITIES: Record<string, Record<Locale, string[]>> = {

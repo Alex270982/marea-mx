@@ -328,6 +328,38 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .maplegend { display: flex; gap: 26px; padding: 16px 4px 0; font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-60); flex-wrap: wrap; }
 .maplegend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; }
 
+/* ---------- live mapbox map ---------- */
+.mapwrap--live { background: #C7DAD5; aspect-ratio: 720 / 830; }
+.sp__map .mapwrap--live { aspect-ratio: auto; height: 100%; }
+.mapwrap--live .mapgl { position: absolute; inset: 0; }
+.mapwrap--live .mapboxgl-canvas { outline: none; }
+.mapwrap--live .mapboxgl-ctrl-group { border-radius: 0; box-shadow: none; border: 1px solid var(--hairline); background: var(--ivory); }
+.mapwrap--live .mapboxgl-ctrl-group button { border-radius: 0; width: 30px; height: 30px; }
+.mapwrap--live .mapboxgl-ctrl-group button + button { border-top: 1px solid var(--hairline); }
+.mapwrap--live .mapboxgl-ctrl-attrib { font-family: var(--font-ui); font-size: 10px; background: rgba(246, 243, 237, 0.85); border-radius: 0; }
+.mapwrap--live .mapboxgl-ctrl-attrib a { color: var(--ink-60); }
+
+/* markers */
+.marea-mk { cursor: pointer; }
+.marea-tag { display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform 0.3s var(--ease-out); transform-origin: 50% 100%; outline-offset: 3px; }
+.marea-mk:hover .marea-tag, .marea-tag:focus-visible { transform: scale(1.05); }
+.marea-tag__label { background: var(--charcoal); color: var(--ivory); font-family: var(--font-ui); font-weight: 600; font-size: 11.5px; letter-spacing: 0.5px; line-height: 1; padding: 5px 8px 4.5px; white-space: nowrap; box-shadow: 0 10px 24px -12px rgba(23, 26, 28, 0.55); }
+.marea-tag__dot { width: 6.8px; height: 6.8px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 1.2px var(--ivory); }
+.marea-cluster { width: 34px; height: 34px; border-radius: 50%; background: var(--charcoal); color: var(--ivory); font-family: var(--font-ui); font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 1px rgba(246, 243, 237, 0.7), 0 12px 26px -14px rgba(23, 26, 28, 0.6); transition: transform 0.3s var(--ease-out); }
+.marea-mk:hover .marea-cluster { transform: scale(1.05); }
+.marea-poi { width: 22px; height: 22px; border-radius: 50%; background: var(--ivory); border: 1px solid #9DB3AC; display: flex; align-items: center; justify-content: center; transition: transform 0.3s var(--ease-out); }
+.marea-mk:hover .marea-poi { transform: scale(1.1); }
+
+/* popups: mirror the .mapcard language, no default mapbox chrome */
+.marea-popup .mapboxgl-popup-content { border-radius: 0; padding: 0; background: transparent; box-shadow: none; font-family: var(--font-ui); line-height: 1.6; }
+.marea-popup .mapboxgl-popup-tip { display: none; }
+.marea-popcard { width: 240px; background: var(--white); border: 1px solid var(--hairline); box-shadow: 0 24px 60px -24px rgba(23, 26, 28, 0.4); padding: 0 0 14px; cursor: pointer; }
+.marea-popcard img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; margin-bottom: 12px; }
+.marea-popcard h4 { font-family: var(--font-display); font-size: 1.02rem; font-weight: 540; padding: 0 14px 2px; }
+.marea-popcard p { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-40); padding: 0 14px 6px; }
+.marea-popcard b { font-size: 0.85rem; padding: 0 14px; font-weight: 560; }
+.marea-popname { background: var(--white); border: 1px solid var(--hairline); box-shadow: 0 18px 44px -20px rgba(23, 26, 28, 0.4); padding: 9px 13px; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-60); white-space: nowrap; }
+
 /* ============================================================
    INVESTMENT
    ============================================================ */

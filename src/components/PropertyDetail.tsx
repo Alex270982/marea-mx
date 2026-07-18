@@ -19,7 +19,7 @@ import {
 } from "@/lib/motion";
 import AssetImg from "@/components/AssetImg";
 import { useSaved } from "@/components/SavedProvider";
-import MapExplorer from "@/components/MapExplorer";
+import MapPanel from "@/components/MapPanel";
 import InquiryPanel from "@/components/InquiryPanel";
 import Lightbox from "@/components/Lightbox";
 import SimCard from "@/components/SimCard";
@@ -258,7 +258,7 @@ export default function PropertyDetail({
 
             <section>
               <span className="label label--teal">{li.location}</span>
-              <MapExplorer
+              <MapPanel
                 listings={[l]}
                 locale={locale}
                 d={d}

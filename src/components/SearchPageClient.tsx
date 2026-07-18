@@ -14,7 +14,7 @@ import { useSaved } from "@/components/SavedProvider";
 import PropertyRow from "@/components/PropertyRow";
 import QuickView from "@/components/QuickView";
 import CompareBar from "@/components/CompareBar";
-import MapExplorer from "@/components/MapExplorer";
+import MapPanel from "@/components/MapPanel";
 import SimCard from "@/components/SimCard";
 
 interface Query {
@@ -298,7 +298,7 @@ export default function SearchPageClient({ locale, d }: { locale: Locale; d: Dic
             )}
           </div>
           <aside className="sp__map">
-            <MapExplorer listings={results} locale={locale} d={d} />
+            <MapPanel listings={results} locale={locale} d={d} />
           </aside>
         </div>
       </main>

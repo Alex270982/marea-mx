@@ -6,7 +6,7 @@ import Opener from "@/components/Opener";
 import SearchBand from "@/components/SearchBand";
 import FeaturedRows from "@/components/FeaturedRows";
 import DestinationChapters from "@/components/DestinationChapters";
-import MapExplorer from "@/components/MapExplorer";
+import MapPanel from "@/components/MapPanel";
 import InvestmentSection from "@/components/InvestmentSection";
 import ConciergeCta from "@/components/ConciergeCta";
 import SectionMotion from "@/components/SectionMotion";
@@ -66,7 +66,7 @@ export default async function HomePage({
           <h2 className="d2">{m.sub.split(".")[0]}.</h2>
           <p className="body-m">{m.sub.split(".").slice(1).join(".").trim()}</p>
         </div>
-        <MapExplorer listings={LISTINGS} locale={loc} d={d} id="homemap" />
+        <MapPanel listings={LISTINGS} locale={loc} d={d} id="homemap" />
         <div className="maplegend">
           <span>
             <i style={{ background: "var(--teal)" }}></i>
