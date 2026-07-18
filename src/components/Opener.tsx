@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { asset, OPENER_VIDEO } from "@/lib/assets";
+import { asset, OPENER_VIDEO, OPENER_VIDEO_MOBILE } from "@/lib/assets";
 import type { Dict, Locale } from "@/lib/i18n";
 import { prefersReducedMotion } from "@/lib/motion";
 
@@ -11,6 +11,7 @@ const CHAPTER_LABELS = ["01", "02", "03", "04"];
 interface OpenerMode {
   short: boolean;
   video: boolean;
+  mobile: boolean;
 }
 
 export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
@@ -39,17 +40,20 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
     } catch {
       /* private mode */
     }
-    /* phones always get the settled 100dvh hero — no scroll-hijack,
-       no chapters, no video fetch (CSS also collapses .opener < 900px) */
-    const short = seen || reduce || window.innerWidth < 900;
     const nav = navigator as Navigator & { connection?: { saveData?: boolean } };
-    const video =
-      Boolean(OPENER_VIDEO) &&
-      !short &&
-      !reduce &&
-      window.innerWidth >= 900 &&
-      !(nav.connection && nav.connection.saveData);
-    setMode({ short, video });
+    const saveData = Boolean(nav.connection && nav.connection.saveData);
+    const mobile = window.innerWidth < 900;
+    if (mobile) {
+      /* phones get the full scroll-scrub film (shorter 320vh pin) when a
+         lightweight mobile encode exists and conditions allow; otherwise the
+         settled 100dvh hero */
+      const cinema = !seen && !reduce && !saveData && Boolean(OPENER_VIDEO_MOBILE);
+      setMode({ short: !cinema, video: cinema, mobile });
+    } else {
+      const short = seen || reduce;
+      const video = Boolean(OPENER_VIDEO) && !short && !saveData;
+      setMode({ short, video, mobile });
+    }
   }, []);
 
   /* chapter caption entrance */
@@ -92,8 +96,19 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
     let xhr: XMLHttpRequest | null = null;
     let safetyTimer: ReturnType<typeof setTimeout> | null = null;
     let statementShown = false;
+    let filmReady = false;
 
     const dismissLoader = () => setLoaderDone(true);
+
+    /* mobile-only graceful degradation: if the film can't arrive (missing
+       encode, fetch failure, timeout), settle into the static 100dvh hero
+       instead of leaving a broken tall scroll. Desktop keeps the tall
+       poster-backed scroll exactly as before. */
+    const failToStatic = () => {
+      if (aborted || filmReady) return;
+      dismissLoader();
+      if (mode.mobile) setMode({ short: true, video: false, mobile: true });
+    };
 
     const showStatement = (show: boolean) => {
       if (show === statementShown) return;
@@ -123,8 +138,9 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
 
     /* video loading with real progress */
     if (mode.video) {
+      const src = mode.mobile && OPENER_VIDEO_MOBILE ? OPENER_VIDEO_MOBILE : OPENER_VIDEO;
       xhr = new XMLHttpRequest();
-      xhr.open("GET", OPENER_VIDEO, true);
+      xhr.open("GET", src, true);
       xhr.responseType = "blob";
       xhr.onprogress = (e) => {
         if (!e.lengthComputable) return;
@@ -135,7 +151,7 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
       };
       xhr.onload = () => {
         if (aborted || !xhr || xhr.status !== 200) {
-          dismissLoader();
+          failToStatic();
           return;
         }
         blobUrl = URL.createObjectURL(xhr.response as Blob);
@@ -149,6 +165,7 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
           "loadeddata",
           () => {
             if (aborted || !video) return;
+            filmReady = true;
             videoDuration = video.duration || 12;
             mediaRef.current?.appendChild(video);
             video.currentTime = 0.001;
@@ -157,13 +174,13 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
           },
           { once: true }
         );
-        video.addEventListener("error", dismissLoader, { once: true });
+        video.addEventListener("error", failToStatic, { once: true });
         video.load();
       };
-      xhr.onerror = dismissLoader;
+      xhr.onerror = failToStatic;
       xhr.send();
       /* safety: never hold the page hostage */
-      safetyTimer = setTimeout(dismissLoader, 9000);
+      safetyTimer = setTimeout(failToStatic, 9000);
     } else {
       dismissLoader();
     }
@@ -250,7 +267,7 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
 
   return (
     <section
-      className="opener"
+      className={"opener" + (mode?.mobile && !short ? " opener--mobile" : "")}
       id="opener"
       ref={sectionRef}
       style={short ? { height: "100dvh" } : undefined}

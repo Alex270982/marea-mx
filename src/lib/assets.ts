@@ -58,6 +58,14 @@ export const OPENER_VIDEO = ASSETS_BASE.startsWith("/")
   ? `${ASSETS_BASE}openerVideo.mp4`
   : `${ASSETS_BASE}hf_20260718_054943_49351765-f1fa-48ad-b2da-c55cdba478c0.mp4`;
 
+/** Lightweight ~720p encode for the phone scroll-scrub opener. Produced by CI
+    (ffmpeg) next to the mirrored assets; it has no CDN counterpart, so when we
+    are still pointing at the remote CDN (dev fallback) it is null and phones
+    get the settled static hero instead. */
+export const OPENER_VIDEO_MOBILE: string | null = ASSETS_BASE.startsWith("/")
+  ? `${ASSETS_BASE}openerVideo-mobile.mp4`
+  : null;
+
 /** Remote source files, used by scripts/download-assets.mjs to mirror locally. */
 export const ASSET_SOURCE_FILES: Record<string, string> = FILES;
 export const OPENER_VIDEO_SOURCE =
