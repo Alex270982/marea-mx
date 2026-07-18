@@ -78,7 +78,13 @@ export function startFilmScrub(opts: FilmScrubOptions): FilmScrub {
   xhr = new XMLHttpRequest();
   xhr.open("GET", opts.src, true);
   xhr.responseType = "blob";
+  let lastLoaded = 0;
+  let progressed = false;
   xhr.onprogress = (e) => {
+    if (e.loaded > lastLoaded) {
+      lastLoaded = e.loaded;
+      progressed = true;
+    }
     if (!e.lengthComputable) return;
     opts.onProgress?.(e.loaded / e.total);
   };
@@ -111,8 +117,19 @@ export function startFilmScrub(opts: FilmScrubOptions): FilmScrub {
   };
   xhr.onerror = fail;
   xhr.send();
-  /* safety: never hold the page hostage */
-  safetyTimer = setTimeout(fail, opts.timeoutMs ?? 9000);
+  /* safety: never hold the page hostage. The timer is a STALL detector:
+     while bytes keep arriving it re-arms instead of failing, so slow
+     connections still get the film once the download completes. */
+  const safety = () => {
+    if (aborted || failed || videoDuration) return;
+    if (progressed) {
+      progressed = false;
+      safetyTimer = setTimeout(safety, opts.timeoutMs ?? 9000);
+      return;
+    }
+    fail();
+  };
+  safetyTimer = setTimeout(safety, opts.timeoutMs ?? 9000);
 
   return {
     setTargetTime(t: number) {
