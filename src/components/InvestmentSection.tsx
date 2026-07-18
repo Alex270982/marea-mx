@@ -1,5 +1,5 @@
 import type { Dict } from "@/lib/i18n";
-import { asset } from "@/lib/assets";
+import AssetImg from "@/components/AssetImg";
 
 export default function InvestmentSection({ d }: { d: Dict }) {
   const iv = d.invest;
@@ -9,8 +9,7 @@ export default function InvestmentSection({ d }: { d: Dict }) {
         <div className="invest__intro">
           <span className="label label--teal">{iv.eyebrow}</span>
           <h2 className="d2">{iv.title}</h2>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset("g-pool", "raw")} alt="" />
+          <AssetImg k="g-pool" kind="raw" alt="" loading="lazy" />
         </div>
         <div>
           <div className="invest__list">

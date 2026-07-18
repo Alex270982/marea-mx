@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Dict, Locale } from "@/lib/i18n";
 import { LISTINGS, destName, type Listing } from "@/lib/data";
-import { asset } from "@/lib/assets";
 import { ROMAN } from "@/lib/format";
+import AssetImg from "@/components/AssetImg";
 import SaveButton from "@/components/SaveButton";
 import QuickView from "@/components/QuickView";
 import { SpecsInline, PriceBlock } from "@/components/ListingBits";
@@ -37,8 +37,7 @@ function FeatRow({
         data-cursor
         onClick={() => router.push(`/${locale}/properties/${l.slug}/`)}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={asset(l.image, "raw")} alt={l[locale].name} loading={i > 0 ? "lazy" : "eager"} />
+        <AssetImg k={l.image} kind="raw" alt={l[locale].name} loading={i > 0 ? "lazy" : "eager"} />
       </div>
       <div className="feat__body">
         <div className="feat__meta">

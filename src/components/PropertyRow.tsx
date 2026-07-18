@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Dict, Locale } from "@/lib/i18n";
 import { destName, type Listing } from "@/lib/data";
-import { asset } from "@/lib/assets";
 import { fmtUSD } from "@/lib/format";
+import AssetImg from "@/components/AssetImg";
 import SaveButton from "@/components/SaveButton";
 import { SpecsInline } from "@/components/ListingBits";
 import { useSaved } from "@/components/SavedProvider";
@@ -25,8 +25,7 @@ export default function PropertyRow({ l, locale, d, onQuickView }: PropertyRowPr
   return (
     <article className="srow" data-slug={l.slug}>
       <div className="srow__media" onClick={() => router.push(`/${locale}/properties/${l.slug}/`)}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={asset(l.image)} alt={l[locale].name} loading="lazy" />
+        <AssetImg k={l.image} alt={l[locale].name} loading="lazy" />
       </div>
       <div className="srow__body">
         <span className="loc">

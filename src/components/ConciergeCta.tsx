@@ -2,7 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import type { Dict, Locale } from "@/lib/i18n";
-import { asset } from "@/lib/assets";
+import AssetImg from "@/components/AssetImg";
 import { useSaved } from "@/components/SavedProvider";
 
 type FieldKey = "name" | "email" | "msg";
@@ -47,8 +47,7 @@ export default function ConciergeCta({ locale, d }: { locale: Locale; d: Dict })
   return (
     <section className="concierge" id="concierge">
       <div className="concierge__bg">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={asset("concierge", "raw")} alt="" loading="lazy" />
+        <AssetImg k="concierge" kind="raw" alt="" loading="lazy" />
       </div>
       <div className="concierge__inner">
         <div className="concierge__copy">

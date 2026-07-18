@@ -1,14 +1,15 @@
 "use client";
 
 import { useEffect } from "react";
-import { prefersReducedMotion } from "@/lib/motion";
+import { finePointer, prefersReducedMotion } from "@/lib/motion";
 import type Lenis from "lenis";
 
 /** Initializes Lenis smooth scroll with the GSAP ticker bridge.
-    Disabled entirely under prefers-reduced-motion. */
+    Fine-pointer (desktop) devices only — touch phones keep native
+    scrolling — and disabled entirely under prefers-reduced-motion. */
 export default function ClientShell() {
   useEffect(() => {
-    if (prefersReducedMotion()) return;
+    if (prefersReducedMotion() || !finePointer()) return;
     let cancelled = false;
     let lenis: Lenis | null = null;
     let gsapRef: typeof import("gsap").gsap | null = null;

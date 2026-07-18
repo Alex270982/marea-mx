@@ -11,7 +11,13 @@ import {
 } from "@/lib/data";
 import { asset } from "@/lib/assets";
 import { fmtUSDBare, pricePerM2, whatsappHref } from "@/lib/format";
-import { loadGsap, prefersReducedMotion } from "@/lib/motion";
+import {
+  DESKTOP_MOTION_MEDIA,
+  loadGsap,
+  prefersReducedMotion,
+  type GsapMatchMedia
+} from "@/lib/motion";
+import AssetImg from "@/components/AssetImg";
 import { useSaved } from "@/components/SavedProvider";
 import MapExplorer from "@/components/MapExplorer";
 import InquiryPanel from "@/components/InquiryPanel";
@@ -43,15 +49,16 @@ export default function PropertyDetail({
     pushRecent(l.slug);
   }, [l.slug, pushRecent]);
 
-  /* hero settle + section rises */
+  /* hero settle + section rises: desktop only, phones render final state */
   useEffect(() => {
     if (prefersReducedMotion()) return;
     let cancelled = false;
-    let ctx: { revert: () => void } | null = null;
+    let mm: GsapMatchMedia | null = null;
     (async () => {
       const { gsap } = await loadGsap();
       if (cancelled) return;
-      ctx = gsap.context(() => {
+      mm = gsap.matchMedia();
+      mm.add(DESKTOP_MOTION_MEDIA, () => {
         if (heroImgRef.current) {
           gsap.fromTo(heroImgRef.current, { scale: 1.08 }, { scale: 1, duration: 1.6, ease: "power3.out" });
         }
@@ -62,11 +69,11 @@ export default function PropertyDetail({
             { y: 0, duration: 0.9, ease: "power3.out", scrollTrigger: { trigger: sec, start: "top 88%" } }
           );
         });
-      }, mainRef.current || undefined);
+      });
     })();
     return () => {
       cancelled = true;
-      ctx?.revert();
+      mm?.revert();
     };
   }, [l.slug]);
 
@@ -81,8 +88,7 @@ export default function PropertyDetail({
     <>
       <main className="page" style={{ paddingTop: 0 }} ref={mainRef}>
         <section className="pd__hero">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset(l.image, "raw")} alt={loc.name} ref={heroImgRef} />
+          <AssetImg k={l.image} kind="raw" alt={loc.name} ref={heroImgRef} />
           <div className="pd__heromain">
             <div>
               <span className="label">
@@ -168,8 +174,7 @@ export default function PropertyDetail({
               <div className="gallery">
                 {gallery.map((g, i) => (
                   <figure key={g} onClick={() => setLbIndex(i)}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={asset(g, "raw")} alt={`${loc.name} ${i + 1}`} loading={i > 1 ? "lazy" : "eager"} />
+                    <AssetImg k={g} kind="raw" alt={`${loc.name} ${i + 1}`} loading={i > 1 ? "lazy" : "eager"} />
                   </figure>
                 ))}
               </div>

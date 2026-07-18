@@ -39,7 +39,9 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
     } catch {
       /* private mode */
     }
-    const short = seen || reduce;
+    /* phones always get the settled 100dvh hero — no scroll-hijack,
+       no chapters, no video fetch (CSS also collapses .opener < 900px) */
+    const short = seen || reduce || window.innerWidth < 900;
     const nav = navigator as Navigator & { connection?: { saveData?: boolean } };
     const video =
       Boolean(OPENER_VIDEO) &&
@@ -255,8 +257,11 @@ export default function Opener({ locale, d }: { locale: Locale; d: Dict }) {
     >
       <div className="opener__stage" ref={stageRef}>
         <div className="opener__media" ref={mediaRef}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={asset("hero-entry", "raw")} alt={posterAlt} ref={posterRef} />
+          <picture>
+            <source media="(max-width: 900px)" srcSet={asset("hero-entry", "min")} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={asset("hero-entry", "raw")} alt={posterAlt} ref={posterRef} />
+          </picture>
         </div>
         <div className="opener__veil"></div>
         <div className="opener__grain"></div>

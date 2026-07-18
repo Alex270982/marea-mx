@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Dict, Locale } from "@/lib/i18n";
 import { DESTINATIONS, LISTINGS } from "@/lib/data";
-import { asset } from "@/lib/assets";
+import AssetImg from "@/components/AssetImg";
 
 const NUMS = ["01", "02", "03"];
 
@@ -15,8 +15,7 @@ export default function DestinationChapters({ locale, d }: { locale: Locale; d: 
         return (
           <article className="dest__chapter" key={dst.slug}>
             <div className="dest__media" data-plx>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={asset(dst.image, "raw")} alt={loc.name} loading="lazy" />
+              <AssetImg k={dst.image} kind="raw" alt={loc.name} loading="lazy" />
               <span className="dest__num">{NUMS[i]}</span>
             </div>
             <div className="dest__body">

@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { finePointer, loadGsap, prefersReducedMotion } from "@/lib/motion";
+import {
+  DESKTOP_MOTION_MEDIA,
+  finePointer,
+  loadGsap,
+  prefersReducedMotion,
+  type GsapMatchMedia
+} from "@/lib/motion";
 
 /** Ports the home-page scroll choreography from the prototype:
     clip-path reveals on featured rows, parallax on destination media,
@@ -11,14 +17,16 @@ export default function SectionMotion() {
   useEffect(() => {
     if (prefersReducedMotion()) return;
     let cancelled = false;
-    let ctx: { revert: () => void } | null = null;
+    let mm: GsapMatchMedia | null = null;
     const listenerCleanups: Array<() => void> = [];
 
     (async () => {
       const { gsap } = await loadGsap();
       if (cancelled) return;
 
-      ctx = gsap.context(() => {
+      /* scroll choreography: desktop only — phones get zero scroll tweens */
+      mm = gsap.matchMedia();
+      mm.add(DESKTOP_MOTION_MEDIA, () => {
         /* editorial rows: image mask-slide + body drift */
         document.querySelectorAll<HTMLElement>(".feat__row").forEach((row) => {
           const media = row.querySelector(".feat__media");
@@ -108,7 +116,7 @@ export default function SectionMotion() {
 
         /* cursor-aware image drift on featured media */
         document.querySelectorAll<HTMLElement>("[data-cursor] img").forEach((img) => {
-          const wrap = img.parentElement;
+          const wrap = img.closest<HTMLElement>("[data-cursor]");
           if (!wrap) return;
           const qx = gsap.quickTo(img, "xPercent", { duration: 0.8, ease: "power3.out" });
           const onMove = (e: MouseEvent) => {
@@ -129,7 +137,7 @@ export default function SectionMotion() {
     return () => {
       cancelled = true;
       listenerCleanups.forEach((fn) => fn());
-      ctx?.revert();
+      mm?.revert();
     };
   }, []);
 

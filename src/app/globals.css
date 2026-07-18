@@ -40,6 +40,9 @@ body {
   text-rendering: optimizeLegibility;
 }
 img { display: block; max-width: 100%; }
+/* responsive <picture> wrappers (AssetImg) must not affect layout:
+   existing ".x img" selectors and grid/flex placement keep working */
+picture { display: contents; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 ::selection { background: var(--teal); color: var(--ivory); }
@@ -595,6 +598,16 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   .pd__mobilebar .cta-solid { padding: 12px 18px; font-size: 0.66rem; }
   .pd__mobilebar .cta-wa { padding: 0; }
   .sp__filters { top: 68px; }
+}
+
+/* ---------- mobile performance: cheap paints, settled opener ---------- */
+@media (max-width: 900px) {
+  /* backdrop-filter is a per-scroll-frame repaint cost on phones */
+  .nav.is-solid { backdrop-filter: none; background: var(--ivory); }
+  .concierge__form { backdrop-filter: none; background: rgba(23, 26, 28, 0.82); }
+  .opener__grain { display: none; }
+  /* opener never scroll-hijacks on phones: settled 100dvh hero from first paint */
+  .opener { height: 100dvh !important; }
 }
 
 /* ---------- reduced motion ---------- */

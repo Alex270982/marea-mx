@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Dict, Locale } from "@/lib/i18n";
 import { getListing } from "@/lib/data";
-import { asset } from "@/lib/assets";
+import AssetImg from "@/components/AssetImg";
 import Modal from "@/components/Modal";
 import SaveButton from "@/components/SaveButton";
 import { SpecsInline, PriceBlock, locLine } from "@/components/ListingBits";
@@ -23,8 +23,7 @@ export default function QuickView({ slug, locale, d, onClose }: QuickViewProps) 
       {l && (
         <div className="qv">
           <div className="qv__media">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={asset(l.image, "raw")} alt={l[locale].name} />
+            <AssetImg k={l.image} kind="raw" alt={l[locale].name} />
           </div>
           <div className="qv__body">
             <span className="feat__loc">{locLine(l, locale)}</span>

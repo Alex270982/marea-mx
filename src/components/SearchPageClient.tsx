@@ -4,7 +4,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import type { Dict, Locale } from "@/lib/i18n";
 import { DESTINATIONS, LISTINGS, getListing, type Listing } from "@/lib/data";
-import { loadGsap, prefersReducedMotion } from "@/lib/motion";
+import {
+  DESKTOP_MOTION_MEDIA,
+  loadGsap,
+  prefersReducedMotion,
+  type GsapMatchMedia
+} from "@/lib/motion";
 import { useSaved } from "@/components/SavedProvider";
 import PropertyRow from "@/components/PropertyRow";
 import QuickView from "@/components/QuickView";
@@ -93,15 +98,16 @@ export default function SearchPageClient({ locale, d }: { locale: Locale; d: Dic
     router.replace(`/${locale}/properties/${qs ? "?" + qs : ""}`, { scroll: false });
   };
 
-  /* row rise on results change */
+  /* row rise on results change: desktop only, phones render final state */
   useEffect(() => {
     if (prefersReducedMotion()) return;
     let cancelled = false;
-    let ctx: { revert: () => void } | null = null;
+    let mm: GsapMatchMedia | null = null;
     (async () => {
       const { gsap } = await loadGsap();
       if (cancelled) return;
-      ctx = gsap.context(() => {
+      mm = gsap.matchMedia();
+      mm.add(DESKTOP_MOTION_MEDIA, () => {
         document.querySelectorAll<HTMLElement>(".srow").forEach((row) => {
           gsap.fromTo(
             row,
@@ -113,7 +119,7 @@ export default function SearchPageClient({ locale, d }: { locale: Locale; d: Dic
     })();
     return () => {
       cancelled = true;
-      ctx?.revert();
+      mm?.revert();
     };
   }, [results]);
 
